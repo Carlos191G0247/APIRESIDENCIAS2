@@ -10,12 +10,12 @@ namespace APIRESIDENCIAS.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CambiarContraseñaController : ControllerBase
+    public class CambiarContrasenaController : ControllerBase
     {
         private readonly IniciarSesionRepository repository;
         
 
-        public CambiarContraseñaController(IniciarSesionRepository repository)
+        public CambiarContrasenaController(IniciarSesionRepository repository)
         {
             this.repository = repository;
         }
