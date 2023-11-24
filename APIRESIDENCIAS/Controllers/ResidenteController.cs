@@ -47,6 +47,37 @@ namespace APIRESIDENCIAS.Controllers
         [HttpPost]
         public IActionResult Post(ResidenteDTO dto)
         {
+            if (string.IsNullOrWhiteSpace(dto.NombreCompleto))
+                return BadRequest("Escriba su nombre completo.");
+            if (string.IsNullOrEmpty(dto.NumControl))
+            {
+                return BadRequest("Escriba su numero de control");
+            }
+            else if (dto.NumControl.Length > 10)
+            {
+                return BadRequest("El número de control no puede tener más de 10 caracteres");
+            }
+            if (string.IsNullOrEmpty(dto.Cooasesor))
+            {
+                return BadRequest("Escriba el nombre del Cooasesor");
+            }
+            if (dto.Fecha == DateTime.MinValue)
+            {
+                return BadRequest("Fecha no válida");
+            }
+
+            if (string.IsNullOrWhiteSpace(dto.Carrera))
+            {
+                return BadRequest("Seleccione una carrera");
+            }
+
+            if (string.IsNullOrEmpty(dto.Contrasena))
+            {
+                return BadRequest("Escriba su contraseña");
+            }
+
+
+
             // Validamos
             if (ModelState.IsValid)
             {

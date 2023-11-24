@@ -2,10 +2,7 @@
 {
     public class ResidenteDTO
     {
-        public ResidenteDTO()
-        {
-            Fecha = DateTime.Now;
-        }
+      
         public string NombreCompleto { get; set; } = null!;
         public string Cooasesor { get; set; } = null!;
         public DateTime Fecha { get; set; }

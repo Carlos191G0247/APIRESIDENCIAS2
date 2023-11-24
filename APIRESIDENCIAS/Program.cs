@@ -14,6 +14,7 @@ optionsBuilder.UseMySql("server=sistemas19.com;database=sistem21_residenciaswebc
 builder.Services.AddTransient<SolicitudesRepository>();
 builder.Services.AddTransient<ResidentesRepository>();
 builder.Services.AddTransient<ArchivosenviadorRepository>();
+builder.Services.AddTransient<IniciarSesionRepository>();
 builder.Services.AddTransient<Residentes>();
 builder.Services.AddSignalR();
 
