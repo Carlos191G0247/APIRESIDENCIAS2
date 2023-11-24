@@ -2,6 +2,8 @@
 {
     public class CambiarContraseñaDTO
     {
-        public string Numcontrol { get; set; } = null!;
+        public int Id { get; set; }
+        //public string Contrasena { get; set; } = null!;
+
     }
 }

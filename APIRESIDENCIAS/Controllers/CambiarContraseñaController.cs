@@ -13,6 +13,7 @@ namespace APIRESIDENCIAS.Controllers
     public class CambiarContraseñaController : ControllerBase
     {
         private readonly IniciarSesionRepository repository;
+        
 
         public CambiarContraseñaController(IniciarSesionRepository repository)
         {
@@ -21,35 +22,45 @@ namespace APIRESIDENCIAS.Controllers
 
     
         [HttpPost("login")]
-        public IActionResult PostLogin(CambiarContraseñaDTO dto)
+        public IActionResult PostLogin(NumeroControlDTO dto)
         {
-            try
-            {
+            
                 var usuario = repository.GetAll().FirstOrDefault(x => x.Numcontrol == dto.Numcontrol);
                 if (usuario == null)
                 {
                     return NotFound("Número de control incorrecto");
                 }
-                const string caracteresPermitidos = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-                var random = new Random();
-                char[] contraseña = new char[10];
-                for (int i = 0; i < 10; i++)
+          
+                return Ok(usuario.Id);
+        }
+
+        [HttpPut]
+        public IActionResult Put(CambiarContraseñaDTO dto)
+        {
+
+            if (ModelState.IsValid)
+            {
+                var buscar = repository.Get(dto.Id);
+
+                if (buscar != null)
                 {
-                    contraseña[i] = caracteresPermitidos[random.Next(caracteresPermitidos.Length)];
+                    const string caracteresPermitidos = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+                    var random = new Random();
+                    char[] contraseña = new char[10];
+                    for (int i = 0; i < 10; i++)
+                    {
+                        contraseña[i] = caracteresPermitidos[random.Next(caracteresPermitidos.Length)];
+
+                    }
+                    buscar.Contrasena = new string(contraseña);
+                    EnviarCorreoElectronico(buscar.Numcontrol + "@rcarbonifera.tecnm.mx", "Nueva Contraseña", $"Tu nueva contraseña es: {new string(contraseña)}");
+
+                    repository.Update(buscar);
 
                 }
-                EnviarCorreoElectronico("enriquesanmiguel32@gmail.com", "Nueva Contraseña", $"Tu nueva contraseña es: {new string(contraseña)}");
-
-                return Ok();
-
             }
-            catch (Exception)
-            {
+            return Ok();
 
-                return NotFound("Error al enviar el correo electrónico");
-            }
-
-        
         }
 
         private void EnviarCorreoElectronico(string destinatario, string asunto, string cuerpo)
