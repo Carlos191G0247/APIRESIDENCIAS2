@@ -28,7 +28,7 @@ namespace APIRESIDENCIAS.Controllers
                 var usuario = repository.GetAll().FirstOrDefault(x => x.Numcontrol == dto.Numcontrol);
                 if (usuario == null)
                 {
-                    return NotFound("Número de control incorrecto");
+                    return NotFound("Número de control incorrecto o no existe");
                 }
           
                 return Ok(usuario.Id);
