@@ -15,6 +15,7 @@ builder.Services.AddTransient<SolicitudesRepository>();
 builder.Services.AddTransient<ResidentesRepository>();
 builder.Services.AddTransient<ArchivosenviadorRepository>();
 builder.Services.AddTransient<IniciarSesionRepository>();
+builder.Services.AddTransient<AsignartareasRepository>();
 builder.Services.AddTransient<Residentes>();
 builder.Services.AddSignalR();
 
@@ -31,6 +32,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+// Agregar UseStaticFiles y UseDefaultFiles aquí
+app.UseStaticFiles();
+app.UseDefaultFiles();
+
+
 app.UseRouting();
 app.MapControllers();
 app.Run();

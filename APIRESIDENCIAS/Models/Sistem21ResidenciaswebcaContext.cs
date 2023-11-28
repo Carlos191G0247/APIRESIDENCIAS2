@@ -82,10 +82,13 @@ public partial class Sistem21ResidenciaswebcaContext : DbContext
             entity.Property(e => e.Idcoordinador)
                 .HasColumnType("int(11)")
                 .HasColumnName("idcoordinador");
+            entity.Property(e => e.Intruccion)
+                .HasColumnType("text")
+                .HasColumnName("intruccion");
             entity.Property(e => e.NombreTarea).HasMaxLength(60);
-            entity.Property(e => e.Pdf)
-                .HasMaxLength(200)
-                .HasColumnName("pdf");
+            entity.Property(e => e.NumTarea)
+                .HasColumnType("int(2)")
+                .HasColumnName("numTarea");
 
             entity.HasOne(d => d.IdcoordinadorNavigation).WithMany(p => p.Asignaciontareas)
                 .HasForeignKey(d => d.Idcoordinador)

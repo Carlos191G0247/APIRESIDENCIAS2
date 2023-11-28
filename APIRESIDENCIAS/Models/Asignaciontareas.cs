@@ -13,7 +13,9 @@ public partial class Asignaciontareas
 
     public DateTime Fecha { get; set; }
 
-    public string Pdf { get; set; } = null!;
+    public string Intruccion { get; set; } = null!;
+
+    public int NumTarea { get; set; }
 
     public virtual Coordinadores IdcoordinadorNavigation { get; set; } = null!;
 }
