@@ -16,11 +16,11 @@ namespace APIRESIDENCIAS.Controllers
         {
                 this.repository = repository;
         }
-        [HttpGet]
-        public IActionResult Get()
+        [HttpGet("{id}")]
+        public IActionResult Get(int id)
         {
-            var entidad = repository.GetAll();
-            return Ok(entidad);
+            var entidad = repository.Get(id);
+            return Ok(entidad?.NombreCompleto);
             ////var residentes = repository.GetAll();
 
             //if (residentes != null)
