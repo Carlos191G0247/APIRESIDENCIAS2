@@ -20,12 +20,47 @@ namespace APIRESIDENCIAS.Controllers
             this.webHostEnvironment = webHostEnvironment;
 
         }
-        [HttpGet]
-        public IActionResult Get()
+        [HttpGet("todo/{id}")]
+        public IActionResult Get(int id)
         {
-            var entidad = repository.GetAll();
+            var entidad = repository.Get(id);
             return Ok(entidad);
 
+        }
+        [HttpGet("{estatus}")]
+        public IActionResult Getestatus(int estatus)
+        {
+            var entidad = repository.Get(estatus);
+            if (entidad == null)
+            {
+                return NotFound(); 
+            }
+            var estatuss = entidad.Estatus.ToString();
+
+             if (estatuss == "1")
+            {
+                estatuss = "Enviado";
+            }
+            else if(estatuss == "2")
+            {
+                estatuss = "Regresado";
+            }
+            else
+            {
+                estatuss = "No Entregado";
+            }
+            return Ok(estatuss);
+        }
+
+        [HttpGet("{numTarea}/{idResidente}")]
+        public IActionResult Getnumtarea(int numTarea, int idResidente)
+        {
+            var entidad = repository.GetAll().FirstOrDefault(x => x.NumTarea ==numTarea && x.IdResidente==idResidente);
+            if (entidad == null)
+            {
+                return NotFound("No entregado"); 
+            }
+            return Ok(entidad.Id);
         }
         [HttpPost]
         public IActionResult Post(ArchivosEnviadosDTO dto)
@@ -37,6 +72,7 @@ namespace APIRESIDENCIAS.Controllers
                 NombreArchivo = dto.NombreArchivo,
                 FechaEnvio = dto.FechaEnvio,
                 NumTarea = dto.NumTarea,
+                Estatus = 1,
             };
             repository.Insert(ae);
 
@@ -71,7 +107,7 @@ namespace APIRESIDENCIAS.Controllers
             return Ok();
         }
         [HttpDelete]
-        public IActionResult Delete(ArchivosEnviadosDTO p)
+        public IActionResult Delete(EliminarTareaDTO p)
         {
             var tarea = repository.Get(p.Id);
             if (tarea == null)

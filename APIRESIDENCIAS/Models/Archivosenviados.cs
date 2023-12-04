@@ -15,5 +15,7 @@ public partial class Archivosenviados
 
     public int NumTarea { get; set; }
 
+    public int Estatus { get; set; }
+
     public virtual Residentes IdResidenteNavigation { get; set; } = null!;
 }

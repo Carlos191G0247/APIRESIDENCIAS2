@@ -48,6 +48,9 @@ public partial class Sistem21ResidenciaswebcaContext : DbContext
             entity.Property(e => e.Id)
                 .HasColumnType("int(11)")
                 .HasColumnName("id");
+            entity.Property(e => e.Estatus)
+                .HasColumnType("int(1)")
+                .HasColumnName("estatus");
             entity.Property(e => e.FechaEnvio)
                 .HasColumnType("datetime")
                 .HasColumnName("fecha_envio");

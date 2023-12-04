@@ -15,6 +15,5 @@
 
         public int NumTarea { get; set; }
 
-
     }
 }
