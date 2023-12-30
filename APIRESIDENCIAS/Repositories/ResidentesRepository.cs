@@ -13,5 +13,6 @@ namespace APIRESIDENCIAS.Repositories
             return base.GetAll().OrderBy(x => x.NombreCompleto);
         }
 
+
     }
 }

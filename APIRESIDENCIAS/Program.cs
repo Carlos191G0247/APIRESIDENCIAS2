@@ -1,10 +1,38 @@
 
 using APIRESIDENCIAS.Models;
 using APIRESIDENCIAS.Repositories;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
+/// JWT
+/// 
+string audence = "localhost:7136";
+var llave = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("residencias9.1G1234567890"));
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(jwt =>
+{
+
+    jwt.Audience = audence;
+
+    jwt.TokenValidationParameters = new TokenValidationParameters
+    {
+
+        IssuerSigningKey = llave,
+        ValidIssuer = "https://localhost:7136",
+        ValidAudience = audence,
+        ValidateIssuerSigningKey = true,
+        ValidateAudience = true,
+        ValidateIssuer = true,
+    };
+
+});
+//
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -37,6 +65,7 @@ if (app.Environment.IsDevelopment())
 app.UseStaticFiles();
 app.UseDefaultFiles();
 
+app.UseAuthorization();
 
 app.UseRouting();
 app.MapControllers();

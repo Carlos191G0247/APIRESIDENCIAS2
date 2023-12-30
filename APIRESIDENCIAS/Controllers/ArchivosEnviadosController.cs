@@ -4,6 +4,7 @@ using APIRESIDENCIAS.Repositories;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace APIRESIDENCIAS.Controllers
 {
@@ -12,55 +13,104 @@ namespace APIRESIDENCIAS.Controllers
     public class ArchivosEnviadosController : ControllerBase
     {
         private readonly ArchivosenviadorRepository repository;
+        private readonly ResidentesRepository residentesRepository; 
+
         private readonly IWebHostEnvironment webHostEnvironment;
 
-        public ArchivosEnviadosController(ArchivosenviadorRepository repository, IWebHostEnvironment webHostEnvironment)
+        public ArchivosEnviadosController(ArchivosenviadorRepository repository, IWebHostEnvironment webHostEnvironment, ResidentesRepository residentesRepository)
         {
             this.repository = repository;
             this.webHostEnvironment = webHostEnvironment;
+            this.residentesRepository = residentesRepository;
+        }
+        [HttpGet("{numTarea}")]
+        public IActionResult Getestatus(int numTarea)
+        {
+            var id = User.Claims.FirstOrDefault(x => x.Type == "Id");
+            if (User.IsInRole("Admin"))
+            {
+                var userId = id.Value;
+                var userIdInt = int.Parse(userId);
+                var entidad = repository.GetAll().FirstOrDefault(x => x.NumTarea == numTarea && x.IdResidente == userIdInt);
+
+                if (entidad == null)
+                {
+                    return NotFound("No Entregado");
+                }
+                var estatuss = entidad.Estatus.ToString();
+
+                if (estatuss == "1")
+                {
+                    estatuss = "Enviado";
+                }
+                else if (estatuss == "2")
+                {
+                    estatuss = "Regresado";
+                }
+                else if (estatuss == "3")
+                {
+                    estatuss =  "Entregado Tarde";
+                }
+                else
+                {
+                    estatuss = "No Entregado";
+                }
+                return Ok(estatuss);
+            }
+            else { return BadRequest(); }
+            //var entidad = repository.Get(estatus);
 
         }
-        [HttpGet("todo/{id}")]
-        public IActionResult Get(int id)
-        {
-            var entidad = repository.Get(id);
-            return Ok(entidad);
+        //[HttpGet("{estatus}")]
+        //public IActionResult Getestatus(int estatus)
+        //{
+        //    var entidad = repository.Get(estatus);
+        //    if (entidad == null)
+        //    {
+        //        return NotFound(); 
+        //    }
+        //    var estatuss = entidad.Estatus.ToString();
 
-        }
-        [HttpGet("{estatus}")]
-        public IActionResult Getestatus(int estatus)
-        {
-            var entidad = repository.Get(estatus);
-            if (entidad == null)
-            {
-                return NotFound(); 
-            }
-            var estatuss = entidad.Estatus.ToString();
+        //     if (estatuss == "1")
+        //    {
+        //        estatuss = "Enviado";
+        //    }
+        //    else if(estatuss == "2")
+        //    {
+        //        estatuss = "Regresado";
+        //    }
+        //    else
+        //    {
+        //        estatuss = "No Entregado";
+        //    }
+        //    return Ok(estatuss);
+        //}
 
-             if (estatuss == "1")
+        [HttpGet("Datos/{numTarea}")]
+        public IActionResult GetAllDatos(int numTarea)
+        {
+            var id = User.Claims.FirstOrDefault(x => x.Type == "Id");
+            if (User.IsInRole("Admin"))
             {
-                estatuss = "Enviado";
-            }
-            else if(estatuss == "2")
-            {
-                estatuss = "Regresado";
+                var userId = id.Value;
+                var userIdInt = int.Parse(userId);
+                var entidad = repository.GetAll().FirstOrDefault(x => x.NumTarea ==numTarea && x.IdResidente==userIdInt);
+                if (entidad != null)
+                {
+                    return Ok(entidad);
+                }
+                else
+                {
+                    return BadRequest();
+                }
+                
+            
             }
             else
             {
-                estatuss = "No Entregado";
+                return BadRequest("No trajo Ningun Dato");
             }
-            return Ok(estatuss);
-        }
-
-        [HttpGet("{numTarea}/{idResidente}")]
-        public IActionResult Getnumtarea(int numTarea, int idResidente)
-        {
-            var entidad = repository.GetAll().FirstOrDefault(x => x.NumTarea ==numTarea && x.IdResidente==idResidente);
-            if (entidad == null)
-            {
-                return NotFound("No entregado"); 
-            }
-            return Ok(entidad.Id);
+            
         }
         [HttpPost]
         public IActionResult Post(ArchivosEnviadosDTO dto)
@@ -72,7 +122,7 @@ namespace APIRESIDENCIAS.Controllers
                 NombreArchivo = dto.NombreArchivo,
                 FechaEnvio = dto.FechaEnvio,
                 NumTarea = dto.NumTarea,
-                Estatus = 1,
+                Estatus = dto.Estatus,
             };
             repository.Insert(ae);
 
@@ -106,25 +156,84 @@ namespace APIRESIDENCIAS.Controllers
 
             return Ok();
         }
-        [HttpDelete]
-        public IActionResult Delete(EliminarTareaDTO p)
+        [HttpPut("{numTarea}")]
+        public IActionResult Put(int numTarea) 
         {
-            var tarea = repository.Get(p.Id);
-            if (tarea == null)
-                return BadRequest("No existe o ya se eliminado");
 
+            var id = User.Claims.FirstOrDefault(x => x.Type == "Id");
+            if (User.IsInRole("Admin"))
+            {
+                var userId = id.Value;
+                var userIdInt = int.Parse(userId);
+
+                //var entidad = residentesRepository.GetAll().SingleOrDefault(x=>x.IdIniciarSesion==userIdInt) ;
+                var entidad = repository.GetAll().FirstOrDefault(x => x.NumTarea == numTarea && x.IdResidente == userIdInt);
+                entidad.Estatus = 3;
+                repository.Update(entidad);
+
+            }
             else
             {
-                repository.Delete(tarea);
+                return Unauthorized("No se pudo obtener el Id del usuario");
 
-                //borro la imagen
-                var ruta = webHostEnvironment.WebRootPath + $"/pdfs/{p.Id}.pdf";
-                System.IO.File.Delete(ruta);
-
-                return Ok();
             }
+            return Ok("Operación completada exitosamente");
+
 
         }
+    
+        [HttpDelete("{numTarea}")]
+        public IActionResult Delete(int numTarea)
+        {
+            var id = User.Claims.FirstOrDefault(x => x.Type == "Id");
+            if (User.IsInRole("Admin"))
+            {
+                var userId = id.Value;
+                var userIdInt = int.Parse(userId);
+                var entidad = repository.GetAll().FirstOrDefault(x => x.NumTarea == numTarea && x.IdResidente == userIdInt);
+
+                var tarea = repository.Get(entidad.Id);
+                if (tarea == null)
+                    return BadRequest("No existe o ya se eliminado");
+
+                else
+                {
+                    repository.Delete(tarea);
+
+                    //borro la imagen
+                    var ruta = webHostEnvironment.WebRootPath + $"/pdfs/{entidad.Id}.pdf";
+                    System.IO.File.Delete(ruta);
+
+                    return Ok();
+                }
+            }
+            else
+            {
+                return Unauthorized("No se pudo obtener el Id del usuario");
+
+            }
+
+
+        }
+        //[HttpDelete]
+        //public IActionResult Delete(EliminarTareaDTO p)
+        //{
+        //    var tarea = repository.Get(p.Id);
+        //    if (tarea == null)
+        //        return BadRequest("No existe o ya se eliminado");
+
+        //    else
+        //    {
+        //        repository.Delete(tarea);
+
+        //        //borro la imagen
+        //        var ruta = webHostEnvironment.WebRootPath + $"/pdfs/{p.Id}.pdf";
+        //        System.IO.File.Delete(ruta);
+
+        //        return Ok();
+        //    }
+
+        //}
 
     }
 }

@@ -14,6 +14,7 @@
         public DateTime FechaEnvio { get; set; }
 
         public int NumTarea { get; set; }
+        public int Estatus { get; set; }
 
     }
 }

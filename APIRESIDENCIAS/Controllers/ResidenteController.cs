@@ -16,6 +16,25 @@ namespace APIRESIDENCIAS.Controllers
         {
                 this.repository = repository;
         }
+
+        [HttpGet("nombre")]
+        public IActionResult Get()
+        {
+            var id = User.Claims.FirstOrDefault(x => x.Type == "Id");
+            if (User.IsInRole("Admin"))
+            {
+                var userId = id.Value;
+                var userIdInt = int.Parse(userId);
+                var entidad = repository.GetAll().SingleOrDefault(x => x.IdIniciarSesion==userIdInt);
+                return Ok(entidad.NombreCompleto);
+            }
+            else
+            {
+                return Ok("ok");
+            }
+
+
+        }
         [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
