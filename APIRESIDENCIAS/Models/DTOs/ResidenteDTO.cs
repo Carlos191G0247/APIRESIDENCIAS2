@@ -2,12 +2,12 @@
 {
     public class ResidenteDTO
     {
-      
+
         public string NombreCompleto { get; set; } = null!;
         public string Cooasesor { get; set; } = null!;
         public DateTime Fecha { get; set; }
         //Tabla Correo
-        public string Carrera{ get; set; }=null!; 
+        public int Carrera { get; set; }
 
 
         //Tabla IniciarSesion

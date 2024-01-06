@@ -106,6 +106,7 @@ public partial class Sistem21ResidenciaswebcaContext : DbContext
             entity.ToTable("carrera");
 
             entity.Property(e => e.Id)
+                .ValueGeneratedNever()
                 .HasColumnType("int(11)")
                 .HasColumnName("id");
             entity.Property(e => e.NombreCarrera)

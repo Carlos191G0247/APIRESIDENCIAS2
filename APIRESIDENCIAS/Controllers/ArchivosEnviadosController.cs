@@ -23,6 +23,13 @@ namespace APIRESIDENCIAS.Controllers
             this.webHostEnvironment = webHostEnvironment;
             this.residentesRepository = residentesRepository;
         }
+
+        [HttpGet("TareaCordi/{idresidente}/{numtarea}")]
+        public IActionResult GetTareaCordi(int idresidente, int numtarea)
+        {
+            var entidad = repository.GetAll().FirstOrDefault(x => x.NumTarea == numtarea && x.IdResidente == idresidente);
+            return Ok(entidad.Id);
+        }
         [HttpGet("{numTarea}")]
         public IActionResult Getestatus(int numTarea)
         {
@@ -94,6 +101,8 @@ namespace APIRESIDENCIAS.Controllers
             {
                 var userId = id.Value;
                 var userIdInt = int.Parse(userId);
+
+               
                 var entidad = repository.GetAll().FirstOrDefault(x => x.NumTarea ==numTarea && x.IdResidente==userIdInt);
                 if (entidad != null)
                 {
@@ -156,19 +165,18 @@ namespace APIRESIDENCIAS.Controllers
 
             return Ok();
         }
-        [HttpPut("{numTarea}")]
-        public IActionResult Put(int numTarea) 
+        //rol para cordi
+        [HttpPut("{numTarea}/{idresidente}")]
+        public IActionResult Put(int numTarea,int idresidente) 
         {
 
             var id = User.Claims.FirstOrDefault(x => x.Type == "Id");
             if (User.IsInRole("Admin"))
             {
-                var userId = id.Value;
-                var userIdInt = int.Parse(userId);
-
+               
                 //var entidad = residentesRepository.GetAll().SingleOrDefault(x=>x.IdIniciarSesion==userIdInt) ;
-                var entidad = repository.GetAll().FirstOrDefault(x => x.NumTarea == numTarea && x.IdResidente == userIdInt);
-                entidad.Estatus = 3;
+                var entidad = repository.GetAll().FirstOrDefault(x => x.NumTarea == numTarea && x.IdResidente == idresidente);
+                entidad.Estatus = 2;
                 repository.Update(entidad);
 
             }

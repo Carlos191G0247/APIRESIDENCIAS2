@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,7 +34,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 });
 //
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(x=>x.JsonSerializerOptions.ReferenceHandler=ReferenceHandler.IgnoreCycles);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<Sistem21ResidenciaswebcaContext>(optionsBuilder => 
@@ -44,7 +45,10 @@ builder.Services.AddTransient<ResidentesRepository>();
 builder.Services.AddTransient<ArchivosenviadorRepository>();
 builder.Services.AddTransient<IniciarSesionRepository>();
 builder.Services.AddTransient<AsignartareasRepository>();
+builder.Services.AddTransient<CoordinadoresRepository>();
+builder.Services.AddTransient<CarreraRepository>();
 builder.Services.AddTransient<Residentes>();
+
 builder.Services.AddSignalR();
 
 var app = builder.Build();
