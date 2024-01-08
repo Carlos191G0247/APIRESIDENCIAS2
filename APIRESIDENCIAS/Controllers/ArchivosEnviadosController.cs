@@ -1,6 +1,7 @@
 ﻿using APIRESIDENCIAS.Models;
 using APIRESIDENCIAS.Models.DTOs;
 using APIRESIDENCIAS.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -8,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace APIRESIDENCIAS.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ArchivosEnviadosController : ControllerBase
@@ -33,8 +35,8 @@ namespace APIRESIDENCIAS.Controllers
         [HttpGet("{numTarea}")]
         public IActionResult Getestatus(int numTarea)
         {
-            var id = User.Claims.FirstOrDefault(x => x.Type == "Id");
-            if (User.IsInRole("Admin"))
+            var id = User.Claims.FirstOrDefault(x => x.Type == "IdRes");
+            if (User.IsInRole("Residente"))
             {
                 var userId = id.Value;
                 var userIdInt = int.Parse(userId);
@@ -96,12 +98,15 @@ namespace APIRESIDENCIAS.Controllers
         [HttpGet("Datos/{numTarea}")]
         public IActionResult GetAllDatos(int numTarea)
         {
-            var id = User.Claims.FirstOrDefault(x => x.Type == "Id");
-            if (User.IsInRole("Admin"))
+            var id = User.Claims.FirstOrDefault(x => x.Type == "IdRes");
+            if (User.IsInRole("Residente"))
             {
                 var userId = id.Value;
                 var userIdInt = int.Parse(userId);
 
+                var idRes = repository.Context.Archivosenviados.Include(x => x.IdResidenteNavigation).ToList();
+               
+               
                
                 var entidad = repository.GetAll().FirstOrDefault(x => x.NumTarea ==numTarea && x.IdResidente==userIdInt);
                 if (entidad != null)
@@ -124,46 +129,61 @@ namespace APIRESIDENCIAS.Controllers
         [HttpPost]
         public IActionResult Post(ArchivosEnviadosDTO dto)
         {
-
-            Archivosenviados ae = new()
+            if (User.IsInRole("Residente"))
             {
-                IdResidente = dto.IdResidente,
-                NombreArchivo = dto.NombreArchivo,
-                FechaEnvio = dto.FechaEnvio,
-                NumTarea = dto.NumTarea,
-                Estatus = dto.Estatus,
-            };
-            repository.Insert(ae);
+                Archivosenviados ae = new()
+                {
+                    IdResidente = dto.IdResidente,
+                    NombreArchivo = dto.NombreArchivo,
+                    FechaEnvio = dto.FechaEnvio,
+                    NumTarea = dto.NumTarea,
+                    Estatus = dto.Estatus,
+                };
+                repository.Insert(ae);
 
-            return Ok(ae.Id);
+                return Ok(ae.Id);
+            }
+            else
+            {
+                return Unauthorized("No tienes permisos para realizar esta acción.");
+
+            }
+
 
         }
 
         [HttpPost("PDF")]
         public IActionResult Post(PdfDTO dto)
         {
-            // Validar
-
-
-            var producto = repository.Get(dto.Id);
-
-            if (producto == null)
+            if (User.IsInRole("Residente"))
             {
-                return BadRequest("No existe el producto especificado");
+                var producto = repository.Get(dto.Id);
+
+                if (producto == null)
+                {
+                    return BadRequest("No existe el producto especificado");
+                }
+
+                var ruta = webHostEnvironment.WebRootPath + "/pdfs/";
+                System.IO.Directory.CreateDirectory(ruta);
+
+                ruta += dto.Id + ".pdf";
+
+                var file = System.IO.File.Create(ruta);
+
+                byte[] pdf = Convert.FromBase64String(dto.pdfBase64);
+                file.Write(pdf, 0, pdf.Length);
+                file.Close();
+
+                return Ok();
+            }
+            else
+            {
+                return Unauthorized("No tienes permisos para realizar esta acción.");
             }
 
-            var ruta = webHostEnvironment.WebRootPath + "/pdfs/";
-            System.IO.Directory.CreateDirectory(ruta);
 
-            ruta += dto.Id + ".pdf";
-
-            var file = System.IO.File.Create(ruta);
-
-            byte[] pdf = Convert.FromBase64String(dto.pdfBase64);
-            file.Write(pdf, 0, pdf.Length);
-            file.Close();
-
-            return Ok();
+              
         }
         //rol para cordi
         [HttpPut("{numTarea}/{idresidente}")]
@@ -193,8 +213,8 @@ namespace APIRESIDENCIAS.Controllers
         [HttpDelete("{numTarea}")]
         public IActionResult Delete(int numTarea)
         {
-            var id = User.Claims.FirstOrDefault(x => x.Type == "Id");
-            if (User.IsInRole("Admin"))
+            var id = User.Claims.FirstOrDefault(x => x.Type == "IdRes");
+            if (User.IsInRole("Residente"))
             {
                 var userId = id.Value;
                 var userIdInt = int.Parse(userId);

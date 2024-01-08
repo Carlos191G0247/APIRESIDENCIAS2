@@ -69,8 +69,11 @@ if (app.Environment.IsDevelopment())
 app.UseStaticFiles();
 app.UseDefaultFiles();
 
+app.UseRouting();
+
+app.UseAuthentication();  // Asegúrate de agregar esta línea antes de UseAuthorization
+
 app.UseAuthorization();
 
-app.UseRouting();
 app.MapControllers();
 app.Run();

@@ -1,5 +1,6 @@
 ﻿using APIRESIDENCIAS.Models;
 using APIRESIDENCIAS.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -7,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace APIRESIDENCIAS.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class CoordinadoresController : ControllerBase
@@ -20,6 +22,11 @@ namespace APIRESIDENCIAS.Controllers
         [HttpGet("nom")]
         public async Task<IActionResult> Get()
         {
+            
+
+            //Verificar si se usa
+
+
             //List<Coordinadores> xd = new();
 
             //xd = await repository.Context.Coordinadores.Include(x => x.IdCarreraNavigation).ToListAsync();
@@ -44,7 +51,7 @@ namespace APIRESIDENCIAS.Controllers
             }
             else
             {
-                return Ok("ok");
+                return Unauthorized("Acceso No Autorizado");
             }
 
 

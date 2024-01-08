@@ -24,7 +24,7 @@ namespace APIRESIDENCIAS.Controllers
         public IActionResult Login(LoginDTO loginDTO)
         {
             //var login = repository.GetAll().SingleOrDefault(x => x.Numcontrol == loginDTO.Numcontrol && x.Contrasena == loginDTO.Contrasena);
-            var login = repository.Context.Inciarsesion.Include(x=>x.Coordinadores).SingleOrDefault(x => x.Numcontrol == loginDTO.Numcontrol && x.Contrasena == loginDTO.Contrasena);
+            var login = repository.Context.Inciarsesion.Include(x=>x.Coordinadores).Include(x=>x.Residentes).SingleOrDefault(x => x.Numcontrol == loginDTO.Numcontrol && x.Contrasena == loginDTO.Contrasena);
             try
             {
                 //checar si existe en la bd
@@ -35,7 +35,8 @@ namespace APIRESIDENCIAS.Controllers
                     new Claim("Id",login.Id.ToString()),
                     new Claim(ClaimTypes.Name,loginDTO.Numcontrol),
                     new Claim("IdCarrera",login.Coordinadores.FirstOrDefault()?.IdCarrera.ToString()??""),
-                    new Claim(ClaimTypes.Role,"Admin"),
+                    new Claim(ClaimTypes.Role,loginDTO.Rol),
+                    new Claim("IdRes",login.Residentes.FirstOrDefault()?.Id.ToString()??""),
                  };
 
                     SecurityTokenDescriptor tokenDescriptor = new()

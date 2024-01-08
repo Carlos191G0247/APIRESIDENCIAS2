@@ -1,11 +1,13 @@
 ﻿using APIRESIDENCIAS.Models;
 using APIRESIDENCIAS.Models.DTOs;
 using APIRESIDENCIAS.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace APIRESIDENCIAS.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class SolicitudesController : ControllerBase
