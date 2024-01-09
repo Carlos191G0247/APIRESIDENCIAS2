@@ -39,14 +39,14 @@ namespace APIRESIDENCIAS.Controllers
                 if (check1 == true && check2 ==false)
                 {
                     var residentesConArchivos = entidad
-                                 .Where(residente => residente.Archivosenviados != null && residente.Archivosenviados.Any(x => x.NumTarea == numtarea && x.Estatus ==1))
+                                 .Where(residente => residente.Archivosenviados != null && residente.Archivosenviados.Any(x => x.NumTarea == numtarea && x.Estatus ==1 || x.NumTarea == numtarea && x.Estatus ==3))
                                  .ToList();
                     return Ok(residentesConArchivos);
                 }
                 if (check2 == true && check1 == false)
                 {
                     var residentesSinTareas = entidad
-                   .Where(residente => residente.Archivosenviados == null || !residente.Archivosenviados.Any(archivo => archivo.NumTarea == numtarea && archivo.Estatus == 1))
+                   .Where(residente => residente.Archivosenviados == null || !residente.Archivosenviados.Any(archivo => archivo.NumTarea == numtarea && archivo.Estatus == 1 || archivo.NumTarea == numtarea && archivo.Estatus == 3))
                    .ToList();
                     return Ok(residentesSinTareas);
                 }

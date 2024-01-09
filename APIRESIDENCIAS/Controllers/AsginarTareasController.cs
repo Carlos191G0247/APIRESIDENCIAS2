@@ -73,6 +73,10 @@ namespace APIRESIDENCIAS.Controllers
         [HttpPost]
         public IActionResult Post(AsignarTareasDTO dto)
         {
+            if (!User.IsInRole("Admin"))
+            {
+                return Unauthorized("No tienes permisos para realizar esta acción.");
+            }
             var entidad = repository.GetAll().FirstOrDefault(x => x.NumTarea == dto.NumTarea);
 
             if (entidad != null)
@@ -98,26 +102,34 @@ namespace APIRESIDENCIAS.Controllers
         [HttpPost("PDF")]
         public IActionResult Post(PdfDTO dto)
         {
-
-            var producto = repository.Get(dto.Id);
-
-            if (producto == null)
+            if (User.IsInRole("Admin"))
             {
-                return BadRequest("No existe el producto especificado");
+                var producto = repository.Get(dto.Id);
+
+                if (producto == null)
+                {
+                    return BadRequest("No existe el producto especificado");
+                }
+
+                var ruta = webHostEnvironment.WebRootPath + "/tareasasignadas/";
+                System.IO.Directory.CreateDirectory(ruta);
+
+                ruta += dto.Id + ".pdf";
+
+                var file = System.IO.File.Create(ruta);
+
+                byte[] pdf = Convert.FromBase64String(dto.pdfBase64);
+                file.Write(pdf, 0, pdf.Length);
+                file.Close();
+
+                return Ok();
+            }
+            else
+            {
+                return Unauthorized("No se pudo obtener el Id del usuario");
+
             }
 
-            var ruta = webHostEnvironment.WebRootPath + "/tareasasignadas/";
-            System.IO.Directory.CreateDirectory(ruta);
-
-            ruta += dto.Id + ".pdf";
-
-            var file = System.IO.File.Create(ruta);
-
-            byte[] pdf = Convert.FromBase64String(dto.pdfBase64);
-            file.Write(pdf, 0, pdf.Length);
-            file.Close();
-
-            return Ok();
         }
      
         [HttpPut("{tareaId}")]
@@ -131,22 +143,18 @@ namespace APIRESIDENCIAS.Controllers
                 {
                     return BadRequest("Ya existe una tarea con el mismo número. Por favor, elige otro número de tarea ");
                 }
-                // Verifica si el usuario tiene el rol adecuado
                 if (!User.IsInRole("Admin"))
                 {
                     return Unauthorized("No tienes permisos para realizar esta acción.");
                 }
 
-                // Obtiene la tarea existente por su id
                 var tareaExistente = repository.Get(tareaId);
 
-                // Verifica si la tarea existe
                 if (tareaExistente == null)
                 {
                     return NotFound($"No se encontró la tarea ");
                 }
 
-                // Realiza una comparación de los valores actuales y los nuevos valores
                 bool cambiosRealizados =
                     tareaExistente.Idcoordinador != dto.Idcoordinador ||
                     tareaExistente.NombreTarea != dto.NombreTarea ||
@@ -154,35 +162,30 @@ namespace APIRESIDENCIAS.Controllers
                     tareaExistente.Intruccion != dto.Intruccion ||
                     tareaExistente.NumTarea != dto.NumTarea;
 
-                // Si no se realizaron cambios, devuelve un mensaje indicando que no se editó nada
                 if (!cambiosRealizados)
                 {
                     return BadRequest("No realizaste ningun cambio");
                    
                 }
 
-                // Actualiza los campos de la tarea con los valores proporcionados en el DTO
                 tareaExistente.Idcoordinador = dto.Idcoordinador;
                 tareaExistente.NombreTarea = dto.NombreTarea;
                 tareaExistente.Fecha = dto.Fecha;
                 tareaExistente.Intruccion = dto.Intruccion;
                 tareaExistente.NumTarea = dto.NumTarea;
 
-                // Llama al método Update del repositorio para aplicar los cambios
                 repository.Update(tareaExistente);
 
                 return Ok();
             }
             catch (Exception ex)
             {
-                // Maneja cualquier excepción y devuelve un mensaje de error
                 return StatusCode(StatusCodes.Status500InternalServerError, $"Error al actualizar la tarea: {ex.Message}");
             }
         }
 
         
 
-        //rol para admin
         [HttpDelete("{numTarea}")]
         public IActionResult Delete(int numTarea)
         {
@@ -198,7 +201,6 @@ namespace APIRESIDENCIAS.Controllers
                 {
                     repository.Delete(tarea);
 
-                    //borro la imagen
                     var ruta = webHostEnvironment.WebRootPath + $"/pdfs/{numTarea}.pdf";
                     System.IO.File.Delete(ruta);
 
