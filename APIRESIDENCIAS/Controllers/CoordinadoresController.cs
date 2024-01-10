@@ -42,7 +42,7 @@ namespace APIRESIDENCIAS.Controllers
         public IActionResult GetNombre()
         {
             var id = User.Claims.FirstOrDefault(x => x.Type == "Id");
-            if (User.IsInRole("Admin"))
+            if (User.IsInRole("Admin") || User.IsInRole("Telma"))
             {
                 var userId = id.Value;
                 var userIdInt = int.Parse(userId);

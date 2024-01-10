@@ -98,9 +98,84 @@ namespace APIRESIDENCIAS.Controllers
             }
 
 
+
         }
 
-    [HttpGet("nombre")]
+
+        [HttpGet("FiltroTelma/{Fecha}/{check1}/{check2}/{numtarea}/{carrera}")]
+        public IActionResult GetFiltroTelma(int Fecha, bool check1, bool check2, int numtarea, int carrera)
+        {
+           
+            if (User.IsInRole("Telma"))
+            {
+                List<Residentes> entidad;
+                if (carrera == 12)
+                {
+                     entidad = repository.Context.Residentes.Include(x => x.Archivosenviados).Include(x => x.IdIniciarSesionNavigation).Where(x=>x.Fecha.Year == Fecha).ToList();
+
+                }
+                else
+                {
+                     entidad = repository.Context.Residentes.Include(x => x.Archivosenviados).Include(x => x.IdIniciarSesionNavigation).Where(x => x.IdCarrera == carrera && x.Fecha.Year == Fecha).ToList();
+
+                }
+
+
+
+                if (check1 == true && check2 == false)
+                {
+                   
+                    var residentesConArchivos = entidad
+                        .Where(residente => residente.Archivosenviados != null && residente.Archivosenviados.Any(x => x.NumTarea == numtarea && (x.Estatus == 1 || x.Estatus == 3)))
+                        .Select(residente => new
+                        {
+                            Archivosenviados = residente.Archivosenviados
+                                .Where(x => x.NumTarea == numtarea && (x.Estatus == 1 || x.Estatus == 3))
+                                .ToList(),
+                            residente.Cooasesor,
+                            residente.Fecha,
+                            residente.Id,
+                            residente.IdCarrera,
+                            residente.IdCarreraNavigation,
+                            residente.IdIniciarSesion,
+                            residente.IdIniciarSesionNavigation,
+                            residente.NombreCompleto
+                        })
+                        .ToList();
+
+                    return Ok(residentesConArchivos);
+
+                }
+                if (check2 == true && check1 == false)
+                {
+                    var residentesSinTareas = entidad
+                   .Where(residente => residente.Archivosenviados == null || !residente.Archivosenviados.Any(archivo => archivo.NumTarea == numtarea && archivo.Estatus == 1 || archivo.NumTarea == numtarea && archivo.Estatus == 3))
+                   .ToList();
+                    return Ok(residentesSinTareas);
+                }
+                if (check1 == false && check2 == false)
+                {
+                    return Ok(entidad);
+                }
+                if (check1 == true && check2 == true)
+                {
+                    return Ok(entidad);
+                }
+
+
+
+                return Ok(entidad);
+
+            }
+            else
+            {
+                return Ok("ok");
+            }
+
+
+
+        }
+        [HttpGet("nombre")]
         public IActionResult Get()
         {
             var id = User.Claims.FirstOrDefault(x => x.Type == "Id");
@@ -123,6 +198,7 @@ namespace APIRESIDENCIAS.Controllers
         public IActionResult GetAll()
         {
             var id = User.Claims.FirstOrDefault(x => x.Type == "IdCarrera");
+
             //Role Como Coordi
             if (User.IsInRole("Admin"))
             {
@@ -136,6 +212,15 @@ namespace APIRESIDENCIAS.Controllers
                             .Select(x => x.Fecha.Year)
                             .Distinct();
                 return Ok(entidad); 
+            }
+            else if (User.IsInRole("Telma"))
+            {
+                
+                var entidad = repository
+                            .GetAll()                         
+                            .Select(x => x.Fecha.Year)
+                            .Distinct();
+                return Ok(entidad);
             }
             else
             {
@@ -155,7 +240,7 @@ namespace APIRESIDENCIAS.Controllers
         [HttpPost]
         public IActionResult Post(ResidenteDTO dto)
         {
-            if (User.IsInRole("Admin"))
+            if (User.IsInRole("Admin") || User.IsInRole("Telma"))
             {
 
                 var entidad = repository.Context.Inciarsesion.FirstOrDefault(x => x.Numcontrol == dto.NumControl);

@@ -191,7 +191,7 @@ namespace APIRESIDENCIAS.Controllers
         {
 
             var id = User.Claims.FirstOrDefault(x => x.Type == "Id");
-            if (User.IsInRole("Admin"))
+            if (User.IsInRole("Admin")||User.IsInRole("Telma"))
             {
                
                 //var entidad = residentesRepository.GetAll().SingleOrDefault(x=>x.IdIniciarSesion==userIdInt) ;

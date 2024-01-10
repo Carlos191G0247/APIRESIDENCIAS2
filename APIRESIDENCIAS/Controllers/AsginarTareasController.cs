@@ -25,7 +25,7 @@ namespace APIRESIDENCIAS.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            if (User.IsInRole("Admin"))
+            if (User.IsInRole("Admin")|| User.IsInRole("Telma"))
             {
                 var entidad = repository.GetAll().OrderBy(x=>x.NumTarea);
                 return Ok(entidad);
@@ -57,7 +57,7 @@ namespace APIRESIDENCIAS.Controllers
         public IActionResult GetTarea(int tareaId)
         {
             //checar si se usa en admin??
-            if (User.IsInRole("Admin"))
+            if (User.IsInRole("Admin")|| User.IsInRole("Telma"))
             {
                 var entidad = repository.Get(tareaId);
                 return Ok(entidad);
@@ -73,7 +73,7 @@ namespace APIRESIDENCIAS.Controllers
         [HttpPost]
         public IActionResult Post(AsignarTareasDTO dto)
         {
-            if (!User.IsInRole("Admin"))
+            if (!User.IsInRole("Admin") || User.IsInRole("Telma"))
             {
                 return Unauthorized("No tienes permisos para realizar esta acción.");
             }
@@ -102,7 +102,7 @@ namespace APIRESIDENCIAS.Controllers
         [HttpPost("PDF")]
         public IActionResult Post(PdfDTO dto)
         {
-            if (User.IsInRole("Admin"))
+            if (User.IsInRole("Admin") || User.IsInRole("Telma"))
             {
                 var producto = repository.Get(dto.Id);
 
@@ -143,7 +143,7 @@ namespace APIRESIDENCIAS.Controllers
                 {
                     return BadRequest("Ya existe una tarea con el mismo número. Por favor, elige otro número de tarea.");
                 }
-                if (!User.IsInRole("Admin"))
+                if (!User.IsInRole("Admin") || User.IsInRole("Telma"))
                 {
                     return Unauthorized("No tienes permisos para realizar esta acción.");
                 }
@@ -189,7 +189,7 @@ namespace APIRESIDENCIAS.Controllers
         [HttpDelete("{numTarea}")]
         public IActionResult Delete(int numTarea)
         {
-            if (User.IsInRole("Admin"))
+            if (User.IsInRole("Admin") || User.IsInRole("Telma"))
             {
                
 
@@ -219,7 +219,7 @@ namespace APIRESIDENCIAS.Controllers
         [HttpDelete("EliminarPDF/{numTarea}")]
         public IActionResult DeletePDF(int numTarea)
         {
-            if (User.IsInRole("Admin"))
+            if (User.IsInRole("Admin") || User.IsInRole("Telma"))
             {
 
                 var ruta = webHostEnvironment.WebRootPath + $"/tareasasignadas/{numTarea}.pdf";
