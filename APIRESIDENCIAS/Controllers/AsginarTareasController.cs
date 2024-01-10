@@ -137,11 +137,11 @@ namespace APIRESIDENCIAS.Controllers
         {
             try
             {
-                var entidad = repository.GetAll().FirstOrDefault(x => x.NumTarea == dto.NumTarea);
+                var entidad = repository.GetAll().FirstOrDefault(x => x.NumTarea == dto.NumTarea && x.Id != tareaId);
 
                 if (entidad != null)
                 {
-                    return BadRequest("Ya existe una tarea con el mismo número. Por favor, elige otro número de tarea ");
+                    return BadRequest("Ya existe una tarea con el mismo número. Por favor, elige otro número de tarea.");
                 }
                 if (!User.IsInRole("Admin"))
                 {

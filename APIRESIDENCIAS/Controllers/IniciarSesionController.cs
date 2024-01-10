@@ -41,7 +41,10 @@ namespace APIRESIDENCIAS.Controllers
 
                     SecurityTokenDescriptor tokenDescriptor = new()
                     {
-                        Issuer = "https://localhost:7136",
+                    //string issuer = "https://api.example.com";
+                    //string audience = "https://mywebapp.com";
+
+                    Issuer = "https://localhost:7136",
                         Audience = "localhost:7136",
                         IssuedAt = DateTime.UtcNow,
                         Expires = DateTime.UtcNow.AddMinutes(30),

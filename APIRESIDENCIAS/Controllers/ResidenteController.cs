@@ -38,10 +38,38 @@ namespace APIRESIDENCIAS.Controllers
 
                 if (check1 == true && check2 ==false)
                 {
+                    //var residentesConArchivos = entidad
+                    //             .Where(residente => residente.Archivosenviados != null && residente.Archivosenviados.Any(x => x.NumTarea == numtarea && x.Estatus == 1 || x.NumTarea == numtarea && x.Estatus == 3))
+                    //             .ToList();
+                    //return Ok(residentesConArchivos);
+
+
+                    // var residentesConArchivos = entidad
+                    //.Where(residente => residente.Archivosenviados != null && residente.Archivosenviados.Any(x => x.NumTarea == numtarea && x.Estatus == 1 || x.NumTarea == numtarea && x.Estatus == 3))
+                    //.SelectMany(residente => residente.Archivosenviados.Where(x => x.NumTarea == numtarea && (x.Estatus == 1 || x.Estatus == 3)))
+                    //.ToList();
+
+                    // return Ok(residentesConArchivos);
                     var residentesConArchivos = entidad
-                                 .Where(residente => residente.Archivosenviados != null && residente.Archivosenviados.Any(x => x.NumTarea == numtarea && x.Estatus ==1 || x.NumTarea == numtarea && x.Estatus ==3))
-                                 .ToList();
+                        .Where(residente => residente.Archivosenviados != null && residente.Archivosenviados.Any(x => x.NumTarea == numtarea && (x.Estatus == 1 || x.Estatus == 3)))
+                        .Select(residente => new
+                        {
+                            Archivosenviados = residente.Archivosenviados
+                                .Where(x => x.NumTarea == numtarea && (x.Estatus == 1 || x.Estatus == 3))
+                                .ToList(),
+                            residente.Cooasesor,
+                            residente.Fecha,
+                            residente.Id,
+                            residente.IdCarrera,
+                            residente.IdCarreraNavigation,
+                            residente.IdIniciarSesion,
+                            residente.IdIniciarSesionNavigation,
+                            residente.NombreCompleto
+                        })
+                        .ToList();
+
                     return Ok(residentesConArchivos);
+
                 }
                 if (check2 == true && check1 == false)
                 {
@@ -94,10 +122,19 @@ namespace APIRESIDENCIAS.Controllers
         [HttpGet("fecha")]
         public IActionResult GetAll()
         {
+            var id = User.Claims.FirstOrDefault(x => x.Type == "IdCarrera");
             //Role Como Coordi
             if (User.IsInRole("Admin"))
             {
-                var entidad = repository.GetAll().Select(x => x.Fecha.Year).Distinct();
+                var userId = id.Value;                
+                var userIdInt = int.Parse(userId);
+                var trarCarrera = carreraRepository.Get(userIdInt);
+
+                var entidad = repository
+                            .GetAll()
+                            .Where(x => x.IdCarrera == trarCarrera.Id)
+                            .Select(x => x.Fecha.Year)
+                            .Distinct();
                 return Ok(entidad); 
             }
             else
