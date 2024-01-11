@@ -47,7 +47,7 @@ namespace APIRESIDENCIAS.Controllers
                     Issuer = "https://localhost:7136",
                         Audience = "localhost:7136",
                         IssuedAt = DateTime.UtcNow,
-                        Expires = DateTime.UtcNow.AddMinutes(2),
+                        Expires = DateTime.UtcNow.AddMinutes(30),
                         SigningCredentials = new SigningCredentials(
                                 new SymmetricSecurityKey(Encoding.UTF8.GetBytes("residencias9.1G1234567890"))
                                 , SecurityAlgorithms.HmacSha256),
