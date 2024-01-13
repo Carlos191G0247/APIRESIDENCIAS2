@@ -131,11 +131,16 @@ namespace APIRESIDENCIAS.Controllers
         [HttpPost]
         public IActionResult Post(ArchivosEnviadosDTO dto)
         {
+            var id = User.Claims.FirstOrDefault(x => x.Type == "IdRes");
+
             if (User.IsInRole("Residente"))
             {
+                var userId = id.Value;
+                var userIdInt = int.Parse(userId);
+
                 Archivosenviados ae = new()
                 {
-                    IdResidente = dto.IdResidente,
+                    IdResidente = userIdInt,
                     NombreArchivo = dto.NombreArchivo,
                     FechaEnvio = dto.FechaEnvio,
                     NumTarea = dto.NumTarea,
