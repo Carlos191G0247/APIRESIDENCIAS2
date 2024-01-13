@@ -44,8 +44,8 @@ namespace APIRESIDENCIAS.Controllers
                     //string issuer = "https://api.example.com";
                     //string audience = "https://mywebapp.com";
 
-                    Issuer = "https://localhost:7136",
-                        Audience = "localhost:7136",
+                        Issuer = "https://sistemas19.com",
+                        Audience = "residencias.sistemas19.com",
                         IssuedAt = DateTime.UtcNow,
                         Expires = DateTime.UtcNow.AddMinutes(30),
                         SigningCredentials = new SigningCredentials(

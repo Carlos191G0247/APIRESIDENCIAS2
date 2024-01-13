@@ -43,10 +43,12 @@ namespace APIRESIDENCIAS.Controllers
                 var entidad = repository.GetAll().FirstOrDefault(x => x.NumTarea == numTarea && x.IdResidente == userIdInt);
 
                 if (entidad == null)
-                {
-                    return NotFound("No Entregado");
+                {   
+                    return Ok("No Entregado");
                 }
                 var estatuss = entidad.Estatus.ToString();
+
+               
 
                 if (estatuss == "1")
                 {
@@ -115,7 +117,7 @@ namespace APIRESIDENCIAS.Controllers
                 }
                 else
                 {
-                    return BadRequest();
+                    return Ok(entidad);
                 }
                 
             

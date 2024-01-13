@@ -137,12 +137,12 @@ namespace APIRESIDENCIAS.Controllers
         {
             try
             {
-                var entidad = repository.GetAll().FirstOrDefault(x => x.NumTarea == dto.NumTarea && x.Id != tareaId);
+                var entidad = repository.GetAll().FirstOrDefault(x => x.NumTarea == dto.NumTarea && x.Id == tareaId);
 
-                if (entidad != null)
-                {
-                    return BadRequest("Ya existe una tarea con el mismo número. Por favor, elige otro número de tarea.");
-                }
+                //if (entidad.NumTarea !=dto.NumTarea)
+                //{
+                //    return BadRequest("Ya existe una tarea con el mismo número. Por favor, elige otro número de tarea.");
+                //}
                 if (!User.IsInRole("Admin") || User.IsInRole("Telma"))
                 {
                     return Unauthorized("No tienes permisos para realizar esta acción.");

@@ -12,7 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 /// JWT
 /// 
-string audence = "localhost:7136";
+string audence = "residencias.sistemas19.com";
 var llave = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("residencias9.1G1234567890"));
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(jwt =>
@@ -24,7 +24,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
     {
 
         IssuerSigningKey = llave,
-        ValidIssuer = "https://localhost:7136",
+        ValidIssuer = "https://sistemas19.com",
         ValidAudience = audence,
         ValidateIssuerSigningKey = true,
         ValidateAudience = true,
